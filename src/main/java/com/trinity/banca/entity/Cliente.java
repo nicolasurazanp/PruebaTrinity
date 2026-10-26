@@ -76,6 +76,16 @@ public class Cliente {
         // Constructor requerido por JPA
     }
 
+        public Cliente(TipoIdentificacion tipoIdentificacion, String numeroIdentificacion,
+            String nombres, String apellido, String correoElectronico, LocalDate fechaNacimiento) {
+        this.tipoIdentificacion = tipoIdentificacion;
+        this.numeroIdentificacion = numeroIdentificacion;
+        this.nombres = nombres;
+        this.apellido = apellido;
+        this.correoElectronico = correoElectronico;
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
     @PrePersist
     protected void alCrear() {
         this.fechaCreacion = LocalDateTime.now();

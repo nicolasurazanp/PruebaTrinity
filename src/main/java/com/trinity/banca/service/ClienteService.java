@@ -79,4 +79,10 @@ public class ClienteService {
         return existente.getTipoIdentificacion() != datos.getTipoIdentificacion() ||
                 !existente.getNumeroIdentificacion().equals(datos.getNumeroIdentificacion());
     }
+
+    @Transactional 
+    public void eliminar(Long id){
+        Cliente cliente = obtenerPorId(id);
+        clienteRepository.delete(cliente);
+    }
 }

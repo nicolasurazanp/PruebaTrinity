@@ -147,4 +147,23 @@ class ClienteServiceTest {
 
         assertEquals("El cliente debe ser mayor de edad", error.getMessage());
     }
+
+        @Test
+    void eliminarBorraClienteExistente() {
+        Cliente cliente = clienteConEdad(30);
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
+
+        clienteService.eliminar(1L);
+
+        verify(clienteRepository).delete(cliente);
+    }
+
+    @Test
+    void eliminarLanzaExcepcionSiNoExiste() {
+        when(clienteRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(RecursoNoEncontradoException.class, () -> clienteService.eliminar(99L));
+
+        verify(clienteRepository, never()).delete(any());
+    }
 }

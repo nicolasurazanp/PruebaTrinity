@@ -9,14 +9,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = MayorDeEdadValidator.class)
 public @interface MayorDeEdad {
 
+    int EDAD_MINIMA = 18;
+
     String message() default "El cliente debe ser mayor de edad";
 
-    int edadMinima() default 18;
+    int edadMinima() default EDAD_MINIMA;
 
     Class<?>[] groups() default {};
 

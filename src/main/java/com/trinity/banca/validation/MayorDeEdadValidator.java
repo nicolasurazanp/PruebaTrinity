@@ -7,20 +7,24 @@ import java.time.Period;
 
 public class MayorDeEdadValidator implements ConstraintValidator<MayorDeEdad, LocalDate> {
     private int edadMinima;
-    
+
     @Override
-    public void initialize(MayorDeEdad anotacion){
+    public void initialize(MayorDeEdad anotacion) {
         this.edadMinima = anotacion.edadMinima();
     }
 
-    @Override 
-    public boolean isValid(LocalDate fechaNacimiento, 
-        ConstraintValidatorContext context) {
-        if (fechaNacimiento == null){
+    @Override
+    public boolean isValid(LocalDate fechaNacimiento,
+            ConstraintValidatorContext context) {
+        if (fechaNacimiento == null) {
             return true;
         }
-        return Period.between(fechaNacimiento, 
-            LocalDate.now()).getYears() >= edadMinima;
+        return esMayorDeEdad(fechaNacimiento, edadMinima);
+    }
+
+    public static boolean esMayorDeEdad(LocalDate fechaNacimiento, int edadMinima) {
+        return Period.between(fechaNacimiento,
+                LocalDate.now()).getYears() >= edadMinima;
     }
 
 }

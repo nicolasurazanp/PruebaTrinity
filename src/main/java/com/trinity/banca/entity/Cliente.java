@@ -22,14 +22,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(
-    name = "clientes",
-    uniqueConstraints = @UniqueConstraint(
-        name = "uk_clientes_identificacion",
-        columnNames = {"tipo_identificacion", "numero_identificacion"}
-    )
-)
+@Table(name = "clientes", uniqueConstraints = @UniqueConstraint(name = "uk_clientes_identificacion", columnNames = {
+        "tipo_identificacion", "numero_identificacion" }))
 public class Cliente {
+    public static final String PATRON_CORREO = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,7 +52,7 @@ public class Cliente {
     private String apellido;
 
     @NotBlank
-    @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+    @Email(regexp = PATRON_CORREO)
     @Size(max = 150)
     @Column(name = "correo_electronico", nullable = false, length = 150)
     private String correoElectronico;
@@ -74,6 +70,16 @@ public class Cliente {
 
     protected Cliente() {
         // Constructor requerido por JPA
+    }
+
+    public Cliente(TipoIdentificacion tipoIdentificacion, String numeroIdentificacion,
+            String nombres, String apellido, String correoElectronico, LocalDate fechaNacimiento) {
+        this.tipoIdentificacion = tipoIdentificacion;
+        this.numeroIdentificacion = numeroIdentificacion;
+        this.nombres = nombres;
+        this.apellido = apellido;
+        this.correoElectronico = correoElectronico;
+        this.fechaNacimiento = fechaNacimiento;
     }
 
     @PrePersist

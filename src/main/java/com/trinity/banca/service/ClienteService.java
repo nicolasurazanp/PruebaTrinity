@@ -42,6 +42,25 @@ public class ClienteService {
         return clienteRepository.findAll();
     }
 
+    @Transactional
+    public Cliente actualizar(Long id, Cliente datos) {
+        Cliente existente = obtenerPorId(id);
+        validarMayorDeEdad(datos.getFechaNacimiento());
+        if (cambiaIdentificacion(existente, datos)) {
+            validarIdentificacionNoRegistrada(datos.getTipoIdentificacion(),
+                    datos.getNumeroIdentificacion());
+        }
+
+        existente.setTipoIdentificacion(datos.getTipoIdentificacion());
+
+        existente.setNumeroIdentificacion(datos.getNumeroIdentificacion());
+        existente.setNombres(datos.getNombres());
+        existente.setApellido(datos.getApellido());
+        existente.setCorreoElectronico(datos.getCorreoElectronico());
+        existente.setFechaNacimiento(datos.getFechaNacimiento());
+        return existente;
+    }
+
     private void validarMayorDeEdad(LocalDate fechaNacimiento) {
         if (fechaNacimiento != null && !MayorDeEdadValidator.esMayorDeEdad(fechaNacimiento,
                 MayorDeEdad.EDAD_MINIMA)) {
@@ -54,5 +73,10 @@ public class ClienteService {
             throw new ReglaNegocioException("Ya existe un cliente con " + tipo + " " + numero);
         }
 
+    }
+
+    private boolean cambiaIdentificacion(Cliente existente, Cliente datos) {
+        return existente.getTipoIdentificacion() != datos.getTipoIdentificacion() ||
+                !existente.getNumeroIdentificacion().equals(datos.getNumeroIdentificacion());
     }
 }

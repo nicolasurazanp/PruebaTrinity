@@ -76,7 +76,7 @@ class ClienteServiceTest {
         verify(clienteRepository, never()).save(any());
     }
 
-        @Test
+    @Test
     void obtenerPorIdDevuelveClienteExistente() {
         Cliente cliente = clienteConEdad(30);
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
@@ -104,5 +104,47 @@ class ClienteServiceTest {
         List<Cliente> resultado = clienteService.listar();
 
         assertEquals(2, resultado.size());
+    }
+
+    @Test
+    void actualizarModificaLosDatosDelCliente() {
+        Cliente existente = clienteConEdad(30);
+        Cliente datos = new Cliente(TipoIdentificacion.CC, "1020304050", "Ana María", "Gómez",
+                "ana.maria@correo.com", LocalDate.now().minusYears(31));
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(existente));
+
+        Cliente resultado = clienteService.actualizar(1L, datos);
+
+        assertSame(existente, resultado);
+        assertEquals("Ana María", resultado.getNombres());
+        assertEquals("Gómez", resultado.getApellido());
+        assertEquals("ana.maria@correo.com", resultado.getCorreoElectronico());
+        verify(clienteRepository, never()).existsByTipoIdentificacionAndNumeroIdentificacion(any(), any());
+    }
+
+    @Test
+    void actualizarRechazaIdentificacionDeOtroCliente() {
+        Cliente existente = clienteConEdad(30);
+        Cliente datos = new Cliente(TipoIdentificacion.CC, "9999999999", "Ana", "Pérez",
+                "ana@correo.com", LocalDate.now().minusYears(30));
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(existente));
+        when(clienteRepository.existsByTipoIdentificacionAndNumeroIdentificacion(TipoIdentificacion.CC, "9999999999"))
+                .thenReturn(true);
+
+        ReglaNegocioException error = assertThrows(ReglaNegocioException.class,
+                () -> clienteService.actualizar(1L, datos));
+
+        assertEquals("Ya existe un cliente con CC 9999999999", error.getMessage());
+        assertEquals("1020304050", existente.getNumeroIdentificacion());
+    }
+
+    @Test
+    void actualizarRechazaClienteMenorDeEdad() {
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(clienteConEdad(30)));
+
+        ReglaNegocioException error = assertThrows(ReglaNegocioException.class,
+                () -> clienteService.actualizar(1L, clienteConEdad(17)));
+
+        assertEquals("El cliente debe ser mayor de edad", error.getMessage());
     }
 }

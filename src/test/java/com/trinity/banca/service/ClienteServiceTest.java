@@ -21,6 +21,9 @@ import com.trinity.banca.entity.Cliente;
 import com.trinity.banca.entity.TipoIdentificacion;
 import com.trinity.banca.exception.ReglaNegocioException;
 import com.trinity.banca.repository.ClienteRepository;
+import java.util.List;
+import java.util.Optional;
+import com.trinity.banca.exception.RecursoNoEncontradoException;
 
 @ExtendWith(MockitoExtension.class)
 class ClienteServiceTest {
@@ -71,5 +74,35 @@ class ClienteServiceTest {
 
         assertEquals("Ya existe un cliente con CC 1020304050", error.getMessage());
         verify(clienteRepository, never()).save(any());
+    }
+
+        @Test
+    void obtenerPorIdDevuelveClienteExistente() {
+        Cliente cliente = clienteConEdad(30);
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
+
+        Cliente resultado = clienteService.obtenerPorId(1L);
+
+        assertSame(cliente, resultado);
+    }
+
+    @Test
+    void obtenerPorIdLanzaExcepcionSiNoExiste() {
+        when(clienteRepository.findById(99L)).thenReturn(Optional.empty());
+
+        RecursoNoEncontradoException error = assertThrows(RecursoNoEncontradoException.class,
+                () -> clienteService.obtenerPorId(99L));
+
+        assertEquals("No existe un cliente con id 99", error.getMessage());
+    }
+
+    @Test
+    void listarDevuelveTodosLosClientes() {
+        List<Cliente> clientes = List.of(clienteConEdad(30), clienteConEdad(40));
+        when(clienteRepository.findAll()).thenReturn(clientes);
+
+        List<Cliente> resultado = clienteService.listar();
+
+        assertEquals(2, resultado.size());
     }
 }

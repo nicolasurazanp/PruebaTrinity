@@ -11,6 +11,8 @@ import com.trinity.banca.exception.ReglaNegocioException;
 import com.trinity.banca.repository.ClienteRepository;
 import com.trinity.banca.validation.MayorDeEdad;
 import com.trinity.banca.validation.MayorDeEdadValidator;
+import java.util.List;
+import com.trinity.banca.exception.RecursoNoEncontradoException;
 
 @Service
 public class ClienteService {
@@ -29,6 +31,17 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
+    @Transactional(readOnly = true)
+    public Cliente obtenerPorId(Long id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("No existe un cliente con id " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Cliente> listar() {
+        return clienteRepository.findAll();
+    }
+
     private void validarMayorDeEdad(LocalDate fechaNacimiento) {
         if (fechaNacimiento != null && !MayorDeEdadValidator.esMayorDeEdad(fechaNacimiento,
                 MayorDeEdad.EDAD_MINIMA)) {
@@ -36,11 +49,10 @@ public class ClienteService {
         }
     }
 
-   private void validarIdentificacionNoRegistrada(TipoIdentificacion tipo, String numero){
-    if 
-    (clienteRepository.existsByTipoIdentificacionAndNumeroIdentificacion(tipo, numero)){
-        throw new ReglaNegocioException("Ya existe un cliente con " + tipo + " " + numero);
-    }
+    private void validarIdentificacionNoRegistrada(TipoIdentificacion tipo, String numero) {
+        if (clienteRepository.existsByTipoIdentificacionAndNumeroIdentificacion(tipo, numero)) {
+            throw new ReglaNegocioException("Ya existe un cliente con " + tipo + " " + numero);
+        }
 
-   }
+    }
 }

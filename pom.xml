@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>com.trinity</groupId>
 	<artifactId>banca</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<version>1.0.0</version>
+	<name>banca</name>
+	<description>API REST de clientes, productos financieros y transacciones</description>
 	<url/>
 	<licenses>
 		<license/>

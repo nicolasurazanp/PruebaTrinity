@@ -20,7 +20,7 @@ API REST para que los trabajadores de una entidad financiera administren **clien
 ```bash
 docker compose up -d --build
 ```
-Levanta PostgreSQL y la aplicación. La API queda en `http://localhost:8080`. La aplicación espera a que la base de datos esté lista (`healthcheck`) antes de arrancar.
+Levanta PostgreSQL y la aplicación. La interfaz web queda en `http://localhost:8080/` y la API en `http://localhost:8080/api`. La aplicación espera a que la base de datos esté lista (`healthcheck`) antes de arrancar.
 
 ```bash
 docker compose down
@@ -41,6 +41,23 @@ En Windows se usa `mvnw.cmd`. La aplicación se conecta a PostgreSQL en `localho
 ./mvnw test
 ```
 **72 pruebas.** Las de integración (`ClienteFechasTest`, `TransferenciaIntegracionTest` y `BancaApplicationTests`) necesitan PostgreSQL encendido. Las unitarias de Service y Controller no.
+
+---
+
+## Interfaz web
+
+Spring Boot sirve la interfaz desde `src/main/resources/static`, en la misma dirección que la API, así que no necesita un servidor aparte ni configuración de CORS. Está hecha con HTML, CSS y JavaScript sin librerías.
+
+| Sección | Qué permite |
+|---|---|
+| Clientes | Registrar, editar y eliminar clientes |
+| Cuentas | Abrir cuentas y activarlas, inactivarlas o cancelarlas |
+| Transacciones | Consignar, retirar y transferir |
+| Estado de cuenta | Ver el saldo, el saldo disponible y los movimientos de una cuenta |
+
+- Los mensajes de error de la API (`detail` y `errores`) se muestran tal cual: las reglas de negocio viven solo en el backend.
+- Todo dato recibido se escapa antes de mostrarse, para evitar inyección de HTML (XSS).
+- Se adapta a móviles y al modo claro u oscuro del sistema.
 
 ---
 
@@ -230,11 +247,13 @@ La aplicación ya admite la configuración por variables de entorno (por ejemplo
 
 | Rama | Uso |
 |---|---|
-| `main` | Versiones estables entregables. |
+| `main` | Versiones estables entregables, marcadas con etiquetas (`v1.0.0`). |
 | `develop` | Integración de funcionalidades terminadas. |
-| `feature/*` | Una rama por funcionalidad: `entidad-cliente`, `crud-cliente`, `productos`, `transacciones`, `docker`, `documentacion`. |
+| `feature/*` | Una rama por funcionalidad: `entidad-cliente`, `crud-cliente`, `productos`, `transacciones`, `docker`, `documentacion`, `frontend`. |
+| `release/*` | Preparación de una versión: ajustes finales antes de pasar a `main`. |
 
 - Cada funcionalidad se integra en `develop` con `merge --no-ff`, para conservar su historial agrupado.
+- Cada versión pasa por una rama `release/*`, se integra en `main` y en `develop`, y se etiqueta.
 - Mensajes de commit con **Conventional Commits**: `feat`, `fix`, `test`, `refactor`, `style`, `build`, `docs`.
 - Cada commit compila y pasa las pruebas.
 

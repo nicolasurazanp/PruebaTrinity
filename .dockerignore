@@ -1,0 +1,6 @@
+target/
+.git/
+.vscode/
+*.log
+error-test.txt
+HELP.md

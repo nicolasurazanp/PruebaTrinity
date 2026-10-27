@@ -20,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
+import com.trinity.banca.exception.ReglaNegocioException;
 
 @Entity
 @Table(name = "cuentas", uniqueConstraints = @UniqueConstraint(name = "uk_cuentas_numero", columnNames = "numero_cuenta"))
@@ -120,5 +121,28 @@ public class Cuenta {
 
     public LocalDateTime getFechaModificacion() {
         return fechaModificacion;
+    }
+        public void activar() {
+        validarQueNoEsteCancelada();
+        this.estado = EstadoCuenta.ACTIVA;
+    }
+
+    public void inactivar() {
+        validarQueNoEsteCancelada();
+        this.estado = EstadoCuenta.INACTIVA;
+    }
+
+    public void cancelar() {
+        validarQueNoEsteCancelada();
+        if (saldo.compareTo(BigDecimal.ZERO) != 0) {
+            throw new ReglaNegocioException("Solo se pueden cancelar cuentas con saldo igual a $0");
+        }
+        this.estado = EstadoCuenta.CANCELADA;
+    }
+
+    private void validarQueNoEsteCancelada() {
+        if (estado == EstadoCuenta.CANCELADA) {
+            throw new ReglaNegocioException("La cuenta " + numeroCuenta + " está cancelada");
+        }
     }
 }

@@ -24,8 +24,8 @@ public class CuentaService {
             this.generadorNumeroCuenta = generadorNumeroCuenta;
         }
     @Transactional 
-    public Cuenta crear(Long ClienteId, TipoCuenta tipoCuenta, boolean exentaGmf) {
-        Cliente cliente = clienteService.obtenerPorId(ClienteId);
+    public Cuenta crear(Long clienteId, TipoCuenta tipoCuenta, boolean exentaGmf) {
+        Cliente cliente = clienteService.obtenerPorId(clienteId);
         String numeroCuenta =
         generadorNumeroCuenta.generar(tipoCuenta);
         return cuentaRepository.save(new Cuenta(tipoCuenta, numeroCuenta, exentaGmf, cliente));

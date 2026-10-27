@@ -24,7 +24,7 @@ public class CuentaService {
             this.generadorNumeroCuenta = generadorNumeroCuenta;
         }
     @Transactional 
-    public Cuenta crear(Long ClienteId, TipoCuenta tipoCuenta, Boolean exentaGmf) {
+    public Cuenta crear(Long ClienteId, TipoCuenta tipoCuenta, boolean exentaGmf) {
         Cliente cliente = clienteService.obtenerPorId(ClienteId);
         String numeroCuenta =
         generadorNumeroCuenta.generar(tipoCuenta);
@@ -34,7 +34,7 @@ public class CuentaService {
     @Transactional(readOnly = true)
     public Cuenta obtenerPorId(Long id){
         return cuentaRepository.findById(id)
-        .orElseThrow(() -> new RecursoNoEncontradoException("No existe una cuenta con id: " + id));
+        .orElseThrow(() -> new RecursoNoEncontradoException("No existe una cuenta con id " + id));
     }
 
     @Transactional(readOnly = true)
@@ -45,6 +45,13 @@ public class CuentaService {
 
     @Transactional
     public Cuenta activar(Long id){
+        Cuenta cuenta = obtenerPorId(id);
+        cuenta.activar();
+        return cuenta;
+    }
+
+    @Transactional
+    public Cuenta inactivar(Long id) {
         Cuenta cuenta = obtenerPorId(id);
         cuenta.inactivar();
         return cuenta;

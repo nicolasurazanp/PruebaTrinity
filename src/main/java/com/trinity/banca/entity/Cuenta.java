@@ -22,11 +22,7 @@ import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-    name = "cuentas",
-    uniqueConstraints = @UniqueConstraint(name = "uk_cuentas_numero",
-        columnNames = "numero_cuenta")
-    )
+@Table(name = "cuentas", uniqueConstraints = @UniqueConstraint(name = "uk_cuentas_numero", columnNames = "numero_cuenta"))
 
 public class Cuenta {
 
@@ -41,16 +37,15 @@ public class Cuenta {
 
     @NotNull
     @Pattern(regexp = "[0-9]{10}")
-    @Column(name  = "numero_cuenta", nullable = false, length = 10,
-        updatable = false)
-    private String numerooCuenta;
-    
+    @Column(name = "numero_cuenta", nullable = false, length = 10, updatable = false)
+    private String numeroCuenta;
+
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column (name = "estado", nullable = false, length = 20)
+    @Column(name = "estado", nullable = false, length = 20)
     private EstadoCuenta estado;
 
-    @NotNull 
+    @NotNull
     @Column(name = "saldo", nullable = false, precision = 19, scale = 2)
     private BigDecimal saldo;
 
@@ -59,29 +54,71 @@ public class Cuenta {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cliente_id", nullable = false, updatable =
-        false,
-        foreignKey = @ForeignKey(name = "fk_cuentas_cliente"))
-        private Cliente cliente;
+    @JoinColumn(name = "cliente_id", nullable = false, updatable = false, foreignKey = @ForeignKey(name = "fk_cuentas_cliente"))
+    private Cliente cliente;
 
-        @Column(name = "fecha_creacion", nullable = false, updatable =
-            false)
-            private LocalDateTime fechaCreacion;
+    @Column(name = "fecha_creacion", nullable = false, updatable = false)
+    private LocalDateTime fechaCreacion;
 
-        @Column(name = "fecha_modificacion")
-        private LocalDateTime fechaModificacion;
-    
+    @Column(name = "fecha_modificacion")
+    private LocalDateTime fechaModificacion;
 
     protected Cuenta() {
         // Constructor protegido para JPA
     }
 
+    public Cuenta(TipoCuenta tipoCuenta, String numeroCuenta, boolean exentaGmf, Cliente cliente) {
+        this.tipoCuenta = tipoCuenta;
+        this.numeroCuenta = numeroCuenta;
+        this.exentaGmf = exentaGmf;
+        this.cliente = cliente;
+        this.estado = EstadoCuenta.ACTIVA;
+        this.saldo = BigDecimal.ZERO;
+    }
+
     @PrePersist
-    protected void alCrear(){
+    protected void alCrear() {
         this.fechaCreacion = LocalDateTime.now();
     }
+
     @PreUpdate
-    protected void alModificar(){
+    protected void alModificar() {
         this.fechaModificacion = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public TipoCuenta getTipoCuenta() {
+        return tipoCuenta;
+    }
+
+    public String getNumeroCuenta() {
+        return numeroCuenta;
+    }
+
+    public EstadoCuenta getEstado() {
+        return estado;
+    }
+
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
+
+    public boolean isExentaGmf() {
+        return exentaGmf;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public LocalDateTime getFechaModificacion() {
+        return fechaModificacion;
     }
 }

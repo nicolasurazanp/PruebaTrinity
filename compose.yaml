@@ -16,5 +16,16 @@ services:
       timeout: 5s
       retries: 10
 
+  app:
+    build: .
+    container_name: trinity-banca
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/banca
+    ports:
+      - "8080:8080"
+
 volumes:
   postgres_data:

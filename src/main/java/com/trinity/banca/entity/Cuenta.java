@@ -13,6 +13,13 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(
@@ -50,7 +57,31 @@ public class Cuenta {
     @Column(name = "exenta_gmf", nullable = false)
     private boolean exentaGmf;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "cliente_id", nullable = false, updatable =
+        false,
+        foreignKey = @ForeignKey(name = "fk_cuentas_cliente"))
+        private Cliente cliente;
+
+        @Column(name = "fecha_creacion", nullable = false, updatable =
+            false)
+            private LocalDateTime fechaCreacion;
+
+        @Column(name = "fecha_modificacion")
+        private LocalDateTime fechaModificacion;
+    
+
     protected Cuenta() {
         // Constructor protegido para JPA
+    }
+
+    @PrePersist
+    protected void alCrear(){
+        this.fechaCreacion = LocalDateTime.now();
+    }
+    @PreUpdate
+    protected void alModificar(){
+        this.fechaModificacion = LocalDateTime.now();
     }
 }

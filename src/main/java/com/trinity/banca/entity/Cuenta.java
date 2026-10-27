@@ -19,6 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import com.trinity.banca.exception.ReglaNegocioException;
 
@@ -63,6 +64,10 @@ public class Cuenta {
 
     @Column(name = "fecha_modificacion")
     private LocalDateTime fechaModificacion;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 
     protected Cuenta() {
         // Constructor protegido para JPA
@@ -139,6 +144,34 @@ public class Cuenta {
             throw new ReglaNegocioException("Solo se pueden cancelar cuentas con saldo igual a $0");
         }
         this.estado = EstadoCuenta.CANCELADA;
+    }
+
+    public void acreditar(BigDecimal monto) {
+        validarQueEsteActiva();
+        validarMontoPositivo(monto);
+        this.saldo = saldo.add(monto);
+    }
+
+    public void debitar(BigDecimal monto) {
+        validarQueEsteActiva();
+        validarMontoPositivo(monto);
+        BigDecimal nuevoSaldo = saldo.subtract(monto);
+        if (nuevoSaldo.signum() < 0) {
+            throw new ReglaNegocioException("Saldo insuficiente en la cuenta " + numeroCuenta);
+        }
+        this.saldo = nuevoSaldo;
+    }
+
+    private void validarQueEsteActiva() {
+        if (estado != EstadoCuenta.ACTIVA) {
+            throw new ReglaNegocioException("La cuenta " + numeroCuenta + " no está activa");
+        }
+    }
+
+    private void validarMontoPositivo(BigDecimal monto) {
+        if (monto == null || monto.signum() <= 0) {
+            throw new ReglaNegocioException("El monto debe ser mayor que cero");
+        }
     }
 
     private void validarQueNoEsteCancelada() {

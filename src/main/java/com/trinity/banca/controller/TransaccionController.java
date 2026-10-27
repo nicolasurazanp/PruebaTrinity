@@ -20,8 +20,11 @@ import com.trinity.banca.entity.Movimiento;
 import com.trinity.banca.service.CuentaService;
 import com.trinity.banca.service.TransaccionService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+@Tag(name = "Transacciones", description = "Consignaciones, retiros, transferencias y estado de cuenta")
 @RestController
 @RequestMapping("/api")
 public class TransaccionController {
@@ -34,18 +37,21 @@ public class TransaccionController {
         this.cuentaService = cuentaService;
     }
 
+    @Operation(summary = "Consignar en una cuenta")
     @PostMapping("/transacciones/consignaciones")
     @ResponseStatus(HttpStatus.CREATED)
     public MovimientoResponse consignar(@Valid @RequestBody OperacionRequest request) {
         return MovimientoResponse.desde(transaccionService.consignar(request.cuentaId(), request.monto()));
     }
 
+    @Operation(summary = "Retirar de una cuenta")
     @PostMapping("/transacciones/retiros")
     @ResponseStatus(HttpStatus.CREATED)
     public MovimientoResponse retirar(@Valid @RequestBody OperacionRequest request) {
         return MovimientoResponse.desde(transaccionService.retirar(request.cuentaId(), request.monto()));
     }
 
+    @Operation(summary = "Transferir entre dos cuentas")
     @PostMapping("/transacciones/transferencias")
     @ResponseStatus(HttpStatus.CREATED)
     public List<MovimientoResponse> transferir(@Valid @RequestBody TransferenciaRequest request) {
@@ -55,6 +61,7 @@ public class TransaccionController {
                 .toList();
     }
 
+    @Operation(summary = "Consultar el estado de cuenta")
     @GetMapping("/cuentas/{cuentaId}/estado-cuenta")
     public EstadoCuentaResponse estadoDeCuenta(@PathVariable Long cuentaId) {
         List<Movimiento> movimientos = transaccionService.estadoDeCuenta(cuentaId);

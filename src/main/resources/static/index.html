@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Banca</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<header class="cabecera">
+    <div class="marca">
+        <span class="marca-nombre">Banca</span>
+        <span class="marca-detalle">Gestión de clientes y productos</span>
+    </div>
+    <nav class="navegacion" aria-label="Secciones">
+        <button class="pestana activa" data-vista="clientes">Clientes</button>
+        <button class="pestana" data-vista="cuentas">Cuentas</button>
+        <button class="pestana" data-vista="transacciones">Transacciones</button>
+        <button class="pestana" data-vista="estado">Estado de cuenta</button>
+    </nav>
+</header>
+
+<main class="contenido">
+
+    <section class="vista activa" id="vista-clientes">
+        <div class="titulo-vista">
+            <h1>Clientes</h1>
+            <p>Registro, actualización y eliminación de clientes.</p>
+        </div>
+
+        <div class="rejilla">
+            <form class="panel" id="form-cliente" novalidate>
+                <h2 id="titulo-form-cliente">Nuevo cliente</h2>
+                <input type="hidden" name="id">
+                <label>Tipo de identificación
+                    <select name="tipoIdentificacion" required>
+                        <option value="CC">Cédula de ciudadanía</option>
+                        <option value="CE">Cédula de extranjería</option>
+                        <option value="PASAPORTE">Pasaporte</option>
+                    </select>
+                </label>
+                <label>Número de identificación
+                    <input name="numeroIdentificacion" maxlength="20" required>
+                </label>
+                <div class="fila">
+                    <label>Nombres
+                        <input name="nombres" maxlength="100" required>
+                    </label>
+                    <label>Apellido
+                        <input name="apellido" maxlength="100" required>
+                    </label>
+                </div>
+                <label>Correo electrónico
+                    <input name="correoElectronico" type="email" maxlength="150" required>
+                </label>
+                <label>Fecha de nacimiento
+                    <input name="fechaNacimiento" type="date" required>
+                </label>
+                <div class="acciones">
+                    <button type="submit" class="boton primario" id="boton-guardar-cliente">Registrar cliente</button>
+                    <button type="button" class="boton secundario oculto" id="boton-cancelar-edicion">Cancelar edición</button>
+                </div>
+            </form>
+
+            <div class="panel">
+                <h2>Clientes registrados</h2>
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Identificación</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th class="derecha">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabla-clientes"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="vista" id="vista-cuentas">
+        <div class="titulo-vista">
+            <h1>Cuentas</h1>
+            <p>Apertura de cuentas de ahorros y corrientes, y cambios de estado.</p>
+        </div>
+
+        <div class="rejilla">
+            <form class="panel" id="form-cuenta" novalidate>
+                <h2>Nueva cuenta</h2>
+                <label>Cliente
+                    <select name="clienteId" class="selector-cliente" required></select>
+                </label>
+                <label>Tipo de cuenta
+                    <select name="tipoCuenta" required>
+                        <option value="AHORROS">Ahorros</option>
+                        <option value="CORRIENTE">Corriente</option>
+                    </select>
+                </label>
+                <label class="casilla">
+                    <input type="checkbox" name="exentaGmf">
+                    Exenta del GMF
+                </label>
+                <div class="acciones">
+                    <button type="submit" class="boton primario">Abrir cuenta</button>
+                </div>
+            </form>
+
+            <div class="panel">
+                <div class="panel-cabecera">
+                    <h2>Cuentas del cliente</h2>
+                    <select id="cuentas-cliente" class="selector-cliente compacto" aria-label="Cliente"></select>
+                </div>
+                <div class="tabla-contenedor">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th class="derecha">Saldo</th>
+                            <th class="derecha">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabla-cuentas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="vista" id="vista-transacciones">
+        <div class="titulo-vista">
+            <h1>Transacciones</h1>
+            <p>Consignaciones, retiros y transferencias entre cuentas.</p>
+        </div>
+
+        <div class="rejilla">
+            <form class="panel" id="form-operacion" novalidate>
+                <h2>Consignación o retiro</h2>
+                <div class="segmentado" role="radiogroup" aria-label="Tipo de operación">
+                    <label><input type="radio" name="operacion" value="consignaciones" checked><span>Consignar</span></label>
+                    <label><input type="radio" name="operacion" value="retiros"><span>Retirar</span></label>
+                </div>
+                <label>Cliente
+                    <select class="selector-cliente" data-cuentas="operacion-cuenta" required></select>
+                </label>
+                <label>Cuenta
+                    <select name="cuentaId" id="operacion-cuenta" required></select>
+                </label>
+                <label>Monto
+                    <input name="monto" type="number" min="0.01" step="0.01" inputmode="decimal" required>
+                </label>
+                <div class="acciones">
+                    <button type="submit" class="boton primario">Registrar operación</button>
+                </div>
+            </form>
+
+            <form class="panel" id="form-transferencia" novalidate>
+                <h2>Transferencia</h2>
+                <label>Cliente que envía
+                    <select class="selector-cliente" data-cuentas="transferencia-origen" required></select>
+                </label>
+                <label>Cuenta de origen
+                    <select name="cuentaOrigenId" id="transferencia-origen" required></select>
+                </label>
+                <label>Cliente que recibe
+                    <select class="selector-cliente" data-cuentas="transferencia-destino" required></select>
+                </label>
+                <label>Cuenta de destino
+                    <select name="cuentaDestinoId" id="transferencia-destino" required></select>
+                </label>
+                <label>Monto
+                    <input name="monto" type="number" min="0.01" step="0.01" inputmode="decimal" required>
+                </label>
+                <div class="acciones">
+                    <button type="submit" class="boton primario">Transferir</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="vista" id="vista-estado">
+        <div class="titulo-vista">
+            <h1>Estado de cuenta</h1>
+            <p>Saldo y movimientos de una cuenta en orden cronológico.</p>
+        </div>
+
+        <div class="panel filtros">
+            <label>Cliente
+                <select class="selector-cliente" data-cuentas="estado-cuenta"></select>
+            </label>
+            <label>Cuenta
+                <select id="estado-cuenta"></select>
+            </label>
+        </div>
+
+        <div id="estado-resumen" class="resumen oculto">
+            <div class="indicador destacado">
+                <span class="indicador-etiqueta">Saldo</span>
+                <span class="indicador-valor" id="estado-saldo"></span>
+            </div>
+            <div class="indicador">
+                <span class="indicador-etiqueta">Saldo disponible</span>
+                <span class="indicador-valor" id="estado-disponible"></span>
+            </div>
+            <div class="indicador">
+                <span class="indicador-etiqueta">Cuenta</span>
+                <span class="indicador-valor pequeno" id="estado-numero"></span>
+            </div>
+            <div class="indicador">
+                <span class="indicador-etiqueta">Estado</span>
+                <span class="indicador-valor pequeno" id="estado-estado"></span>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Movimientos</h2>
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Transacción</th>
+                        <th>Movimiento</th>
+                        <th class="derecha">Monto</th>
+                        <th class="derecha">Saldo</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabla-movimientos"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<div class="avisos" id="avisos" aria-live="polite"></div>
+
+<dialog id="dialogo-confirmar">
+    <form method="dialog">
+        <h2 id="dialogo-titulo">Confirmar</h2>
+        <p id="dialogo-mensaje"></p>
+        <div class="acciones derecha">
+            <button value="cancelar" class="boton secundario">Cancelar</button>
+            <button value="confirmar" class="boton peligro">Confirmar</button>
+        </div>
+    </form>
+</dialog>
+
+<script src="js/app.js"></script>
+</body>
+</html>

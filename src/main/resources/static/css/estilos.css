@@ -120,6 +120,7 @@ h2 {
     font-size: 0.92rem;
     cursor: pointer;
     white-space: nowrap;
+    text-decoration: none;
     transition: color 0.2s;
 }
 

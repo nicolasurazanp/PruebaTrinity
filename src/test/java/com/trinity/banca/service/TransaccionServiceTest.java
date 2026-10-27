@@ -27,6 +27,7 @@ import com.trinity.banca.entity.TipoCuenta;
 import com.trinity.banca.entity.TipoIdentificacion;
 import com.trinity.banca.entity.TipoMovimiento;
 import com.trinity.banca.entity.TipoTransaccion;
+import com.trinity.banca.exception.RecursoNoEncontradoException;
 import com.trinity.banca.exception.ReglaNegocioException;
 import com.trinity.banca.repository.MovimientoRepository;
 
@@ -133,5 +134,29 @@ class TransaccionServiceTest {
                 () -> transaccionService.transferir(1L, 2L, new BigDecimal("40.00")));
 
         verify(movimientoRepository, never()).saveAll(anyList());
+    }
+
+    @Test
+    void estadoDeCuentaDevuelveLosMovimientosDeLaCuenta() {
+        Cuenta cuenta = cuentaConSaldo("5300000001", "100.00");
+        Movimiento consignacion = new Movimiento("codigo-1", cuenta,
+                TipoTransaccion.CONSIGNACION, TipoMovimiento.CREDITO, new BigDecimal("100.00"));
+        when(cuentaService.obtenerPorId(1L)).thenReturn(cuenta);
+        when(movimientoRepository.findByCuentaIdOrderByFechaAscIdAsc(1L)).thenReturn(List.of(consignacion));
+
+        List<Movimiento> movimientos = transaccionService.estadoDeCuenta(1L);
+
+        assertEquals(1, movimientos.size());
+        assertSame(consignacion, movimientos.get(0));
+    }
+
+    @Test
+    void estadoDeCuentaDeUnaCuentaInexistenteDevuelve404() {
+        when(cuentaService.obtenerPorId(99L))
+                .thenThrow(new RecursoNoEncontradoException("No existe una cuenta con id 99"));
+
+        assertThrows(RecursoNoEncontradoException.class, () -> transaccionService.estadoDeCuenta(99L));
+
+        verifyNoInteractions(movimientoRepository);
     }
 }

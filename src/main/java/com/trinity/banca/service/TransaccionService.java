@@ -59,6 +59,12 @@ public class TransaccionService {
         return movimientoRepository.saveAll(List.of(debito, credito));
     }
 
+    @Transactional(readOnly = true)
+    public List<Movimiento> estadoDeCuenta(Long cuentaId) {
+        cuentaService.obtenerPorId(cuentaId);
+        return movimientoRepository.findByCuentaIdOrderByFechaAscIdAsc(cuentaId);
+    }
+
     private String nuevoCodigo() {
         return UUID.randomUUID().toString();
     }

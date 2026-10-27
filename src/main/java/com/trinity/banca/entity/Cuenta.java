@@ -146,6 +146,34 @@ public class Cuenta {
         this.estado = EstadoCuenta.CANCELADA;
     }
 
+    public void acreditar(BigDecimal monto) {
+        validarQueEsteActiva();
+        validarMontoPositivo(monto);
+        this.saldo = saldo.add(monto);
+    }
+
+    public void debitar(BigDecimal monto) {
+        validarQueEsteActiva();
+        validarMontoPositivo(monto);
+        BigDecimal nuevoSaldo = saldo.subtract(monto);
+        if (nuevoSaldo.signum() < 0) {
+            throw new ReglaNegocioException("Saldo insuficiente en la cuenta " + numeroCuenta);
+        }
+        this.saldo = nuevoSaldo;
+    }
+
+    private void validarQueEsteActiva() {
+        if (estado != EstadoCuenta.ACTIVA) {
+            throw new ReglaNegocioException("La cuenta " + numeroCuenta + " no está activa");
+        }
+    }
+
+    private void validarMontoPositivo(BigDecimal monto) {
+        if (monto == null || monto.signum() <= 0) {
+            throw new ReglaNegocioException("El monto debe ser mayor que cero");
+        }
+    }
+
     private void validarQueNoEsteCancelada() {
         if (estado == EstadoCuenta.CANCELADA) {
             throw new ReglaNegocioException("La cuenta " + numeroCuenta + " está cancelada");

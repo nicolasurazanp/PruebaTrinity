@@ -66,4 +66,63 @@ class CuentaTest {
 
         assertThrows(ReglaNegocioException.class, cuenta::activar);
     }
+
+    @Test
+    void acreditarSumaElMontoAlSaldo() {
+        Cuenta cuenta = nuevaCuenta();
+
+        cuenta.acreditar(new BigDecimal("100.00"));
+
+        assertEquals(0, cuenta.getSaldo().compareTo(new BigDecimal("100.00")));
+    }
+
+    @Test
+    void debitarRestaElMontoDelSaldo() {
+        Cuenta cuenta = nuevaCuenta();
+        cuenta.acreditar(new BigDecimal("100.00"));
+
+        cuenta.debitar(new BigDecimal("30.00"));
+
+        assertEquals(0, cuenta.getSaldo().compareTo(new BigDecimal("70.00")));
+    }
+
+    @Test
+    void debitarTodoElSaldoDejaLaCuentaEnCero() {
+        Cuenta cuenta = nuevaCuenta();
+        cuenta.acreditar(new BigDecimal("100.00"));
+
+        cuenta.debitar(new BigDecimal("100.00"));
+
+        assertEquals(0, cuenta.getSaldo().compareTo(BigDecimal.ZERO));
+    }
+
+    @Test
+    void debitarFallaSiElSaldoQuedariaNegativo() {
+        Cuenta cuenta = nuevaCuenta();
+        cuenta.acreditar(new BigDecimal("100.00"));
+
+        ReglaNegocioException error = assertThrows(ReglaNegocioException.class,
+                () -> cuenta.debitar(new BigDecimal("100.01")));
+
+        assertEquals("Saldo insuficiente en la cuenta 5300000001", error.getMessage());
+        assertEquals(0, cuenta.getSaldo().compareTo(new BigDecimal("100.00")));
+    }
+
+    @Test
+    void noSePuedeOperarUnaCuentaInactiva() {
+        Cuenta cuenta = nuevaCuenta();
+        cuenta.inactivar();
+
+        assertThrows(ReglaNegocioException.class, () -> cuenta.acreditar(new BigDecimal("10.00")));
+        assertThrows(ReglaNegocioException.class, () -> cuenta.debitar(new BigDecimal("10.00")));
+    }
+
+    @Test
+    void elMontoDebeSerMayorQueCero() {
+        Cuenta cuenta = nuevaCuenta();
+
+        assertThrows(ReglaNegocioException.class, () -> cuenta.acreditar(BigDecimal.ZERO));
+        assertThrows(ReglaNegocioException.class, () -> cuenta.acreditar(new BigDecimal("-5.00")));
+        assertThrows(ReglaNegocioException.class, () -> cuenta.acreditar(null));
+    }
 }

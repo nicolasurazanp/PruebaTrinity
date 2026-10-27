@@ -13,13 +13,16 @@ import com.trinity.banca.validation.MayorDeEdad;
 import com.trinity.banca.validation.MayorDeEdadValidator;
 import java.util.List;
 import com.trinity.banca.exception.RecursoNoEncontradoException;
+import com.trinity.banca.repository.CuentaRepository;
 
 @Service
 public class ClienteService {
     private final ClienteRepository clienteRepository;
+    private final CuentaRepository cuentaRepository;
 
-    public ClienteService(ClienteRepository clienteRepository) {
+    public ClienteService(ClienteRepository clienteRepository, CuentaRepository cuentaRepository) {
         this.clienteRepository = clienteRepository;
+        this.cuentaRepository = cuentaRepository;
     }
 
     @Transactional
@@ -80,9 +83,12 @@ public class ClienteService {
                 !existente.getNumeroIdentificacion().equals(datos.getNumeroIdentificacion());
     }
 
-    @Transactional 
-    public void eliminar(Long id){
+    @Transactional
+    public void eliminar(Long id) {
         Cliente cliente = obtenerPorId(id);
+        if (cuentaRepository.existsByClienteId(id)) {
+            throw new ReglaNegocioException("No se puede eliminar el cliente porque tiene productos vinculados");
+        }
         clienteRepository.delete(cliente);
     }
 }

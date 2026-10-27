@@ -19,6 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import com.trinity.banca.exception.ReglaNegocioException;
 
@@ -63,6 +64,10 @@ public class Cuenta {
 
     @Column(name = "fecha_modificacion")
     private LocalDateTime fechaModificacion;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 
     protected Cuenta() {
         // Constructor protegido para JPA

@@ -7,5 +7,5 @@ import jakarta.validation.constraints.NotNull;
 public record CuentaRequest(
         @NotNull Long clienteId,
         @NotNull TipoCuenta tipoCuenta,
-        boolean exentaGmf) {
+        @NotNull Boolean exentaGmf) {
 }

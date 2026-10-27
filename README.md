@@ -40,7 +40,7 @@ En Windows se usa `mvnw.cmd`. La aplicación se conecta a PostgreSQL en `localho
 ```bash
 ./mvnw test
 ```
-**72 pruebas.** Las de integración (`ClienteFechasTest`, `TransferenciaIntegracionTest` y `BancaApplicationTests`) necesitan PostgreSQL encendido. Las unitarias de Service y Controller no.
+**74 pruebas.** Las de integración (`ClienteFechasTest`, `TransferenciaIntegracionTest`, `DocumentacionApiTest` y `BancaApplicationTests`) necesitan PostgreSQL encendido. Las unitarias de Service y Controller no.
 
 ---
 
@@ -58,6 +58,19 @@ Spring Boot sirve la interfaz desde `src/main/resources/static`, en la misma dir
 - Los mensajes de error de la API (`detail` y `errores`) se muestran tal cual: las reglas de negocio viven solo en el backend.
 - Todo dato recibido se escapa antes de mostrarse, para evitar inyección de HTML (XSS).
 - Se adapta a móviles y al modo claro u oscuro del sistema.
+
+---
+
+## Documentación interactiva (Swagger)
+
+Con la aplicación en marcha:
+
+| Recurso | Dirección |
+|---|---|
+| Swagger UI: probar la API desde el navegador | `http://localhost:8080/swagger-ui/index.html` |
+| Especificación OpenAPI 3 en JSON | `http://localhost:8080/v3/api-docs` |
+
+La genera **springdoc-openapi** a partir de los controllers, los DTO y sus validaciones (`@NotNull`, `@Positive`, `@Size`…), así que siempre está sincronizada con el código. Los endpoints se agrupan por recurso con `@Tag` y cada uno tiene su resumen con `@Operation`. La interfaz web enlaza a ella desde la opción *API* del menú.
 
 ---
 

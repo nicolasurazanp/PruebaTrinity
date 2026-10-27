@@ -24,12 +24,16 @@ import com.trinity.banca.repository.ClienteRepository;
 import java.util.List;
 import java.util.Optional;
 import com.trinity.banca.exception.RecursoNoEncontradoException;
+import com.trinity.banca.repository.CuentaRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ClienteServiceTest {
 
     @Mock
     private ClienteRepository clienteRepository;
+
+    @Mock
+    private CuentaRepository cuentaRepository;
 
     @InjectMocks
     private ClienteService clienteService;
@@ -148,7 +152,7 @@ class ClienteServiceTest {
         assertEquals("El cliente debe ser mayor de edad", error.getMessage());
     }
 
-        @Test
+    @Test
     void eliminarBorraClienteExistente() {
         Cliente cliente = clienteConEdad(30);
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
@@ -164,6 +168,18 @@ class ClienteServiceTest {
 
         assertThrows(RecursoNoEncontradoException.class, () -> clienteService.eliminar(99L));
 
+        verify(clienteRepository, never()).delete(any());
+    }
+
+    @Test
+    void eliminarRechazaClienteConProductosVinculados() {
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(clienteConEdad(30)));
+        when(cuentaRepository.existsByClienteId(1L)).thenReturn(true);
+
+        ReglaNegocioException error = assertThrows(ReglaNegocioException.class,
+                () -> clienteService.eliminar(1L));
+
+        assertEquals("No se puede eliminar el cliente porque tiene productos vinculados", error.getMessage());
         verify(clienteRepository, never()).delete(any());
     }
 }

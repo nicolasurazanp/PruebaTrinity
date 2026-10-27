@@ -122,7 +122,8 @@ public class Cuenta {
     public LocalDateTime getFechaModificacion() {
         return fechaModificacion;
     }
-        public void activar() {
+
+    public void activar() {
         validarQueNoEsteCancelada();
         this.estado = EstadoCuenta.ACTIVA;
     }
